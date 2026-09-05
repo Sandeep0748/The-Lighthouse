@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A Window Through the Day — a living window that changes with your real local time." />
+  <meta name="color-scheme" content="dark light" />
+  <title>A Window Through the Day</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="stage" aria-label="A window view that changes with the real local time of day">
+    <!-- Soft room wall behind the window -->
+    <div class="wall" aria-hidden="true"></div>
+
+    <div class="composition">
+      <!-- UI overlay -->
+      <header class="ui" aria-label="Time information">
+        <p class="eyebrow">A Window Through the Day</p>
+        <div class="ui-row">
+          <time id="clock" class="clock" datetime="">--:--</time>
+          <span id="phaseLabel" class="phase" aria-live="polite">…</span>
+        </div>
+        <p id="phaseDesc" class="desc" aria-live="polite">Looking outside…</p>
+      </header>
+
+      <!-- The window -->
+      <section class="window-wrap" aria-label="Window scene showing sky, sun, moon, city and birds according to local time">
+        <div class="window" id="window" role="img" aria-label="Illustrated view through a window that reflects the current time of day">
+          <div class="view" aria-hidden="true">
+            <div class="sky"></div>
+            <div class="stars" id="stars"></div>
+            <div class="sun" id="sun"></div>
+            <div class="moon" id="moon"></div>
+
+            <div class="clouds">
+              <div class="cloud c1"></div>
+              <div class="cloud c2"></div>
+              <div class="cloud c3"></div>
+              <div class="cloud c4"></div>
+              <div class="cloud c5"></div>
+            </div>
+
+            <div class="mist"></div>
+
+            <div class="birds" id="birds" aria-hidden="true">
+              <span class="bird b1"></span>
+              <span class="bird b2"></span>
+              <span class="bird b3"></span>
+              <span class="bird b4"></span>
+              <span class="bird b5"></span>
+              <span class="bird b6"></span>
+            </div>
+
+            <div class="hills hill-far"></div>
+            <div class="hills hill-near"></div>
+
+            <div class="skyline skyline-far" aria-hidden="true">
+              <i style="--h:34%"></i><i style="--h:52%"></i><i style="--h:42%"></i>
+              <i style="--h:64%"></i><i style="--h:48%"></i><i style="--h:58%"></i>
+              <i style="--h:38%"></i><i style="--h:70%"></i><i style="--h:46%"></i>
+              <i style="--h:56%"></i><i style="--h:40%"></i><i style="--h:62%"></i>
+            </div>
+            <div class="skyline skyline-near" aria-hidden="true">
+              <i style="--h:46%"></i><i style="--h:72%"></i><i style="--h:58%"></i>
+              <i style="--h:84%"></i><i style="--h:62%"></i><i style="--h:76%"></i>
+              <i style="--h:50%"></i><i style="--h:90%"></i><i style="--h:66%"></i>
+            </div>
+            <div class="ground"></div>
+            <div class="streetlights" aria-hidden="true">
+              <span class="lamp l1"></span>
+              <span class="lamp l2"></span>
+              <span class="lamp l3"></span>
+            </div>
+
+            <div class="warm-wash"></div>
+            <div class="night-dim"></div>
+            <div class="glare"></div>
+          </div>
+
+          <!-- Frame + mullions sit above the view -->
+          <div class="mullion mullion-v" aria-hidden="true"></div>
+          <div class="mullion mullion-h" aria-hidden="true"></div>
+          <div class="frame" aria-hidden="true"></div>
+        </div>
+
+        <!-- Indoor sill / foreground -->
+        <div class="sill" aria-hidden="true">
+          <div class="sill-top"></div>
+          <div class="sill-objects">
+            <div class="plant">
+              <span class="leaf leaf-1"></span>
+              <span class="leaf leaf-2"></span>
+              <span class="leaf leaf-3"></span>
+              <span class="leaf leaf-4"></span>
+              <span class="pot"></span>
+            </div>
+            <div class="books">
+              <span class="book book-1"></span>
+              <span class="book book-2"></span>
+            </div>
+            <div class="mug">
+              <span class="mug-body"></span>
+              <span class="mug-steam s1"></span>
+              <span class="mug-steam s2"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Timeline indicator -->
+      <footer class="timeline" aria-label="Time of day progress">
+        <div class="timeline-track" aria-hidden="true">
+          <div class="timeline-gradient"></div>
+          <div class="timeline-marker" id="timelineMarker"></div>
+        </div>
+        <div class="timeline-labels" aria-hidden="true">
+          <span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>12a</span>
+        </div>
+        <p class="hint">Live — driven by your device clock. Golden-hour birds visit ~5–6 PM.</p>
+      </footer>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
