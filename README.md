@@ -16,7 +16,8 @@ No frameworks. No libraries. No images. No build step. Just `index.html`,
   first paint, no warm-up) and every second after — no clicks, no refresh.
 - **Continuous change:** 13 sky keyframes are lerped with smoothstep; sun and
   moon ride sine arcs; one `nightF` factor (from star opacity) re-lights the
-  sea, rocks, lamp, beam and brightness. Categories only pick label text.
+  sea, rocks and brightness, while the lamp/beam follow an explicit schedule
+  (verified against dawn ghost-glow). Categories only pick label text.
 - **Special moment — "First Light", 6:30–7:00 PM local:** the lamp glass warms
   from 6:20 PM, the rotating double beam fades up, and a lit ship crosses —
   all with 10-minute smoothstep fades, all time-gated, zero on screen by day.
@@ -49,9 +50,10 @@ To preview moments, change the OS clock and reload.
 
 **Approach.** I wanted the strongest possible day/night contrast, so I chose
 a lighthouse: by day it's gulls and glittering water; by night it's a
-sweeping beam. One scene, re-lit — never swapped. The time engine from my
-first concept (window) carried over untouched: sky stops, sun/moon arcs,
-star-derived `nightF`. Only the "actors" changed — tower, beam, ship, sea.
+sweeping beam. One scene, re-lit — never swapped. The sky, sun/moon and
+star engine carried over from my first concept (window) untouched; only the
+"actors" changed — tower, beam, ship, sea — and the lamp runs on an explicit
+on/off schedule so it can never glow at the wrong hour.
 
 **Always correct.** `new Date()` is the single source of truth, sampled on
 script evaluation before first paint and re-sampled every second via
