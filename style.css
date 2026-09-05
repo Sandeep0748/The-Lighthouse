@@ -43,6 +43,14 @@
   /* Room */
   --wall-top: #2b3350;
   --wall-bot: #1a2036;
+  --shimmer-opacity: 0.4;
+  --glitter-opacity: 0;
+  --halo-opacity: 0;
+  --foam-opacity: 0.3;
+  --buoy-opacity: 0;
+  --sparkle-opacity: 0;
+  --milky-opacity: 0;
+  --meteor-opacity: 0;
 
   /* Special */
   --birds-opacity: 0.9;
@@ -214,6 +222,45 @@ body {
   50% { opacity: 1; transform: scale(1.15); }
 }
 
+/* Milky Way — faint diagonal band, night only */
+.milky {
+  position: absolute;
+  left: -10%;
+  top: -20%;
+  width: 130%;
+  height: 90%;
+  z-index: 1;
+  background: radial-gradient(ellipse 60% 22% at 62% 40%, rgba(200, 215, 255, 0.20), transparent 70%);
+  transform: rotate(-18deg);
+  filter: blur(18px);
+  opacity: var(--milky-opacity);
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+
+/* Shooting star — brief streak, night only */
+.meteor {
+  position: absolute;
+  left: 62%;
+  top: 14%;
+  width: 120px;
+  height: 2px;
+  z-index: 2;
+  border-radius: 999px;
+  background: linear-gradient(to left, #fff, transparent);
+  transform: rotate(-24deg);
+  opacity: 0;
+  pointer-events: none;
+  animation: meteor 14s linear infinite;
+}
+
+@keyframes meteor {
+  0%, 88% { opacity: 0; translate: 0 0; }
+  89% { opacity: var(--meteor-opacity); }
+  93% { opacity: 0; translate: -180px 78px; }
+  100% { opacity: 0; translate: 0 0; }
+}
+
 /* Sun */
 .sun {
   position: absolute;
@@ -275,9 +322,9 @@ body {
   border-radius: 999px;
   background: var(--cloud-color);
   opacity: var(--cloud-opacity);
-  filter: blur(1px);
+  filter: blur(5px);
   box-shadow:
-    0 10px 26px rgba(60, 80, 120, 0.20),
+    0 12px 28px rgba(60, 80, 120, 0.16),
     34px 6px 0 -2px var(--cloud-color),
     -30px 8px 0 -4px var(--cloud-color);
   transition: opacity 1.5s ease, background 1.2s linear;
@@ -379,15 +426,134 @@ body {
   height: 30%;
   z-index: 7;
   background: repeating-linear-gradient(to bottom,
-    rgba(255, 255, 255, 0.14) 0 2px, transparent 2px 12px);
-  opacity: 0.5;
+    rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 11px);
+  opacity: var(--shimmer-opacity, 0.4);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 38%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 38%);
+  filter: blur(0.6px);
   animation: shimmer 7s ease-in-out infinite;
   pointer-events: none;
+  transition: opacity 1.2s linear;
 }
 
 @keyframes shimmer {
-  0%, 100% { transform: translateX(0); opacity: 0.4; }
-  50% { transform: translateX(-14px); opacity: 0.6; }
+  0%, 100% { transform: translateX(0); filter: brightness(0.92); }
+  50% { transform: translateX(-14px); filter: brightness(1.08); }
+}
+
+/* Moon glitter — narrow column tracking the moon's x */
+.moon-glitter {
+  position: absolute;
+  left: var(--moon-x);
+  bottom: 0;
+  width: 7%;
+  height: 22%;
+  transform: translateX(-50%);
+  z-index: 7;
+  background: linear-gradient(to bottom, rgba(210, 225, 255, 0.28), rgba(210, 225, 255, 0.04));
+  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+  opacity: var(--glitter-opacity);
+  transition: opacity 1.5s ease, left 1.2s linear;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 35%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 35%);
+  filter: blur(1.5px);
+}
+
+/* Foam edges — lapping lines at headland + foreground rocks */
+.foam {
+  position: absolute;
+  z-index: 8;
+  height: 3px;
+  pointer-events: none;
+  background: repeating-linear-gradient(to right,
+    rgba(255, 255, 255, 0.35) 0 8px, transparent 8px 18px);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  opacity: var(--foam-opacity);
+  transition: opacity 1.2s linear;
+  animation: foamDrift 9s ease-in-out infinite;
+}
+
+.foam-head {
+  left: 2%;
+  bottom: 30.8%;
+  width: 28%;
+}
+
+.foam-fg {
+  right: 0;
+  bottom: 6.5%;
+  width: 36%;
+  border-radius: 50%;
+  rotate: -4deg;
+}
+
+@keyframes foamDrift {
+  0%, 100% { translate: 0 0; }
+  50% { translate: -10px 0; }
+}
+
+/* Night sparkles — few twinkling points on dark water */
+.sea-sparkles {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30%;
+  z-index: 7;
+  opacity: var(--sparkle-opacity);
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+
+.spark {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #dfe8ff;
+  box-shadow: 0 0 6px rgba(220, 232, 255, 0.9);
+  animation: twinkle 3.4s ease-in-out infinite;
+}
+
+/* Buoy — blinking red marker, night only */
+.buoy {
+  position: absolute;
+  right: 26%;
+  bottom: 15%;
+  width: 12px;
+  height: 16px;
+  z-index: 8;
+  opacity: var(--buoy-opacity);
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+
+.buoy::before {
+  content: "";
+  position: absolute;
+  inset: 5px 0 0;
+  background: #2c3342;
+  clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+}
+
+.buoy-light {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #ff5a5a;
+  box-shadow: 0 0 12px 6px rgba(255, 90, 90, 0.7);
+  animation: buoyBlink 3s steps(1) infinite;
+}
+
+@keyframes buoyBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.12; }
 }
 
 /* Warm path of the beam on the water */
@@ -404,13 +570,19 @@ body {
   opacity: var(--beam-opacity);
   transition: opacity 1.5s ease;
   pointer-events: none;
-  animation: reflectionSway 5s ease-in-out infinite;
+  filter: brightness(1);
+  animation: reflectionSway 5s ease-in-out infinite, reflectionPulse 8s ease-in-out infinite;
 }
 
-/* Transform-only: never touches opacity, so --beam-opacity stays in charge */
+/* Transform + filter only: never touches opacity, so --beam-opacity stays in charge */
 @keyframes reflectionSway {
   0%, 100% { transform: translateX(-50%) skewX(0deg); }
   50% { transform: translateX(calc(-50% - 6px)) skewX(-1.5deg); }
+}
+
+@keyframes reflectionPulse {
+  0%, 100% { filter: brightness(0.72); }
+  50% { filter: brightness(1.15); }
 }
 
 /* Headland the lighthouse stands on */
@@ -425,6 +597,20 @@ body {
   box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.14);
   z-index: 9;
   transition: background 1.2s linear;
+}
+
+.headland::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 4%;
+  top: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to right, rgba(255, 220, 150, 0.85), rgba(255, 220, 150, 0.08));
+  opacity: var(--lamp-opacity);
+  transition: opacity 1.2s ease;
+  pointer-events: none;
 }
 
 /* ---------- Lighthouse ---------- */
@@ -456,11 +642,12 @@ body {
   position: absolute;
   left: 50%;
   top: 34%;
-  width: 12px;
-  height: 16px;
+  width: 16px;
+  height: 22px;
   transform: translateX(-50%);
-  border-radius: 6px 6px 2px 2px;
+  border-radius: 8px 8px 3px 3px;
   background: #2c3342;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
   overflow: hidden;
 }
 
@@ -477,12 +664,26 @@ body {
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: 26px;
-  height: 38px;
+  width: 32px;
+  height: 46px;
   transform: translateX(-50%);
   background: #3a2c22;
-  border-radius: 13px 13px 0 0;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 16px 16px 0 0;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.door::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 72px;
+  height: 20px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 50% 50% at 50% 0%, rgba(255, 205, 130, 0.55), transparent 70%);
+  opacity: var(--lamp-opacity);
+  transition: opacity 1.2s ease;
+  pointer-events: none;
 }
 
 .gallery {
@@ -527,26 +728,42 @@ body {
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
+/* Lamp halo — soft radial glow around the lamp, night only */
+.lamp-halo {
+  position: absolute;
+  left: 18%;
+  top: 29.5%;
+  width: 22%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: radial-gradient(circle, rgba(255, 230, 170, 0.55) 0%, rgba(255, 210, 130, 0.18) 35%, transparent 65%);
+  opacity: var(--halo-opacity);
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+
 /* Rotating double beam — visible only when the lamp is awake */
 .beam {
   position: absolute;
   left: 18%;
-  top: 21%;
-  width: 150%;
+  top: 29.5%;
+  width: 95%;
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   z-index: 11;
   background: conic-gradient(from 0deg,
-    rgba(255, 240, 190, 0.5) 0deg 10deg,
-    transparent 10deg 170deg,
-    rgba(255, 240, 190, 0.5) 180deg 190deg,
-    transparent 190deg 360deg);
-  -webkit-mask-image: radial-gradient(circle, black 0 26%, transparent 60%);
-  mask-image: radial-gradient(circle, black 0 26%, transparent 60%);
+    rgba(255, 240, 190, 0.42) 0deg 12deg,
+    transparent 12deg 168deg,
+    rgba(255, 240, 190, 0.42) 180deg 192deg,
+    transparent 192deg 360deg);
+  -webkit-mask-image: radial-gradient(circle, black 0 18%, transparent 52%);
+  mask-image: radial-gradient(circle, black 0 18%, transparent 52%);
   opacity: var(--beam-opacity);
   transition: opacity 1.5s ease;
   animation: sweep 16s linear infinite;
   pointer-events: none;
+  filter: blur(2px);
 }
 
 @keyframes sweep {
@@ -631,6 +848,20 @@ body {
     -60px 10px 0 -8px var(--rock-deep);
   z-index: 13;
   transition: background 1.2s linear;
+}
+
+.rocks-fg::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 10%;
+  top: 1px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(to right, rgba(200, 215, 255, 0.05), rgba(200, 215, 255, 0.4));
+  opacity: var(--night-opacity);
+  transition: opacity 1.2s ease;
+  pointer-events: none;
 }
 
 /* Sea mist at dawn */
@@ -780,7 +1011,7 @@ body {
     border-radius: 18px;
   }
   .lighthouse { width: 26%; min-width: 84px; }
-  .beam { width: 190%; }
+  .beam { width: 135%; }
   .ship { scale: 0.85; }
   .caption { font-size: 12px; }
 }
@@ -795,7 +1026,8 @@ body {
 /* ---------- Accessibility ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .cloud, .bird, .star, .sea-shimmer, .beam, .beam-reflection, .ship {
+  .cloud, .bird, .star, .spark, .sea-shimmer, .beam, .beam-reflection, .ship,
+  .meteor, .foam, .buoy-light {
     animation: none !important;
   }
   .sun, .moon, .stars, .gulls, .warm-wash, .night-dim,

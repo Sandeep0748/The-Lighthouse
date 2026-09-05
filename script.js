@@ -13,9 +13,12 @@
   var phaseEl = document.getElementById('phaseLabel');
   var descEl = document.getElementById('phaseDesc');
   var starsEl = document.getElementById('stars');
+  var seaSparklesEl = document.getElementById('seaSparkles');
+  var keeperEl = document.getElementById('keeperNote');
   var windowEl = document.getElementById('window');
 
   var lastPhase = '';
+  var lastKeeper = '';
 
   /* ---------- helpers ---------- */
 
@@ -143,6 +146,16 @@
     return { label: 'Night watch', desc: 'Night — moon, stars and the turning beam. All is well.' };
   }
 
+  function keeperNoteFor(h) {
+    if (h >= 5 && h < 7.5) return "Keeper's note — dawn mist. Gulls waking, lamp cooling.";
+    if (h >= 7.5 && h < 12) return "Keeper's note — bright watch. Lamp asleep, gulls out.";
+    if (h >= 12 && h < 17) return "Keeper's note — high day. Polish the lens, watch the water.";
+    if (h >= 17 && h < 18.5) return "Keeper's note — sunset soon. Lamp warms ~6:20 PM.";
+    if (h >= 18.5 && h < 19) return "Keeper's note — first light! Beam up, ship passing.";
+    if (h >= 19 && h < 22) return "Keeper's note — beam steady. All ships warned.";
+    return "Keeper's note — the lamp wakes ~6:30 PM. Watch for the passing ship.";
+  }
+
   /**
    * updateSpecialMoment — "First Light", ~6:30 PM–7:00 PM local.
    * The lamp warms up over the first 10 minutes, holds while a small
@@ -178,6 +191,7 @@
     root.style.setProperty('--beam-opacity', beam.toFixed(3));
     root.style.setProperty('--ship-opacity', ship.toFixed(3));
     root.style.setProperty('--lamp-opacity', lamp.toFixed(3));
+    root.style.setProperty('--halo-opacity', lamp.toFixed(3));
     root.style.setProperty('--birds-opacity', gulls.toFixed(3));
     return { beam: beam, ship: ship };
   }
@@ -198,7 +212,13 @@
     var warm = smooth(1 - Math.abs(h - 17.6) / 1.7);
 
     var brightness = clamp(1.02 - nightF * 0.28 + warm * 0.03, 0.72, 1.05);
-    var cloudOp = clamp(0.3 + (1 - nightF) * 0.6 - mist * 0.1, 0.15, 0.95);
+    var cloudOp = clamp(0.18 + (1 - nightF) * 0.65 - mist * 0.1, 0.12, 0.95);
+    var shimmerOp = clamp(0.55 - nightF * 0.37, 0.15, 0.6);
+    var glitterOp = moon.opacity * 0.35;
+    var foamOp = clamp(0.18 + (1 - nightF) * 0.22, 0.12, 0.45);
+    var buoyOp = nightF;
+    var sparkleOp = nightF * 0.85;
+    var milkyOp = nightF * 0.6;
     var glare = clamp(0.08 + (1 - nightF) * 0.12 + warm * 0.16, 0.05, 0.36);
     var glow = clamp(0.45 + (1 - sun.elevation) * 0.35 + warm * 0.3, 0, 1);
     var shadow = clamp(sun.elevation * (1 - nightF), 0, 1) * 0.5;
@@ -225,6 +245,13 @@
     s.setProperty('--stars-opacity', nightF.toFixed(3));
 
     s.setProperty('--cloud-opacity', cloudOp.toFixed(3));
+    s.setProperty('--shimmer-opacity', shimmerOp.toFixed(3));
+    s.setProperty('--glitter-opacity', glitterOp.toFixed(3));
+    s.setProperty('--foam-opacity', foamOp.toFixed(3));
+    s.setProperty('--buoy-opacity', buoyOp.toFixed(3));
+    s.setProperty('--sparkle-opacity', sparkleOp.toFixed(3));
+    s.setProperty('--milky-opacity', milkyOp.toFixed(3));
+    s.setProperty('--meteor-opacity', nightF.toFixed(3));
     s.setProperty('--cloud-color', rgb(lerpColor(PAL.cloudDay, PAL.cloudNight, nightF)));
     s.setProperty('--mist-opacity', mist.toFixed(3));
     s.setProperty('--warm-opacity', (warm * 0.6).toFixed(3));
@@ -278,6 +305,11 @@
       if (phaseEl) phaseEl.textContent = ph.label;
       if (descEl) descEl.textContent = ph.desc;
     }
+    var note = keeperNoteFor(t.decimal);
+    if (note !== lastKeeper) {
+      lastKeeper = note;
+      if (keeperEl) keeperEl.textContent = note;
+    }
   }
 
   function buildStars() {
@@ -299,6 +331,21 @@
     starsEl.appendChild(frag);
   }
 
+  function buildSeaSparkles() {
+    if (!seaSparklesEl || seaSparklesEl.childNodes.length > 0) return;
+    var frag = document.createDocumentFragment();
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (var i = 0; i < 12; i++) {
+      var sp = document.createElement('span');
+      sp.className = 'spark';
+      sp.style.left = (8 + Math.random() * 84).toFixed(2) + '%';
+      sp.style.top = (20 + Math.random() * 70).toFixed(2) + '%';
+      if (!reduced) sp.style.animationDelay = (-Math.random() * 3.4).toFixed(2) + 's';
+      frag.appendChild(sp);
+    }
+    seaSparklesEl.appendChild(frag);
+  }
+
   function tick() {
     var t = getTimeProgress(new Date());
     var nightF = clamp(starOpacityAt(t.decimal), 0, 1);
@@ -310,6 +357,7 @@
   // Immediate correct state: paint the right moment before the user
   // sees anything, with no loading screen and no play-from-midnight.
   buildStars();
+  buildSeaSparkles();
   tick();
   window.setInterval(tick, 1000);
 
