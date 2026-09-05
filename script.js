@@ -58,7 +58,9 @@
     { h: 16.0, top: [47, 125, 232], mid: [122, 184, 240],bot: [214, 236, 255] },
     { h: 17.0, top: [58, 92, 192],  mid: [232, 138, 90], bot: [255, 207, 138] },
     { h: 17.75,top: [61, 58, 122],  mid: [232, 106, 106],bot: [255, 180, 94] },
+    { h: 18.25,top: [70, 60, 130],  mid: [250, 130, 90], bot: [255, 200, 130] },
     { h: 18.5, top: [44, 33, 84],   mid: [138, 74, 138], bot: [255, 138, 90] },
+    { h: 18.75,top: [36, 28, 72],   mid: [110, 60, 120], bot: [220, 120, 110] },
     { h: 19.5, top: [23, 21, 58],   mid: [61, 42, 94],   bot: [122, 74, 122] },
     { h: 20.5, top: [6, 10, 26],    mid: [11, 21, 48],   bot: [26, 35, 64] },
     { h: 24.0, top: [6, 10, 26],    mid: [11, 21, 48],   bot: [26, 35, 64] }
@@ -148,10 +150,13 @@
 
   function keeperNoteFor(h) {
     if (h >= 5 && h < 7.5) return "Keeper's note — dawn mist. Gulls waking, lamp cooling.";
-    if (h >= 7.5 && h < 12) return "Keeper's note — bright watch. Lamp asleep, gulls out.";
-    if (h >= 12 && h < 17) return "Keeper's note — high day. Polish the lens, watch the water.";
-    if (h >= 17 && h < 18.5) return "Keeper's note — sunset soon. Lamp warms ~6:20 PM.";
-    if (h >= 18.5 && h < 19) return "Keeper's note — first light! Beam up, ship passing.";
+    if (h >= 7.5 && h < 10) return "Keeper's note — bright watch. Lamp asleep, gulls out.";
+    if (h >= 10 && h < 17) return "Keeper's note — beach day. Kids at the shore, lamp asleep.";
+    if (h >= 17 && h < 18.33) return "Keeper's note — beach emptying. Sunset soon, lamp warms ~6:20 PM.";
+    if (h >= 18.33 && h < 18.5) return "Keeper's note — dusk settling. Beacon waking up.";
+    if (h >= 18.5 && h < 18.7) return "Keeper's note — first light! Beam sweeping the dusk.";
+    if (h >= 18.7 && h < 18.9) return "Keeper's note — passing ship spotted — 2.8 km offshore.";
+    if (h >= 18.9 && h < 19.0) return "Keeper's note — ship passed safely.";
     if (h >= 19 && h < 22) return "Keeper's note — beam steady. All ships warned.";
     return "Keeper's note — the lamp wakes ~6:30 PM. Watch for the passing ship.";
   }
@@ -188,10 +193,22 @@
     var gulls = clamp((1 - nightF) * 0.9 - warmup * 0.4, 0, 0.9);
     if (h >= 18.5) gulls *= Math.max(0, 1 - (h - 18.5) / 0.5);
 
+    // Beach people: full 10 AM–5 PM, fade out by 6:30 PM. Zero at night.
+    var people = 0;
+    if (h >= 10 && h < 17) people = 1;
+    else if (h >= 9.5 && h < 10) people = smooth((h - 9.5) / 0.5);
+    else if (h >= 17 && h < 18.5) people = 1 - smooth((h - 17) / 1.5);
+
+    // Beam x ship: peaks ~6:42 PM when the ship is mid-crossing.
+    // Lights the hull via filter brightness in CSS. Zero outside window.
+    var beamOnShip = smooth(1 - Math.abs(h - 18.7) / 0.3) * beam * ship;
+
     root.style.setProperty('--beam-opacity', beam.toFixed(3));
+    root.style.setProperty('--beam-on-ship', beamOnShip.toFixed(3));
     root.style.setProperty('--ship-opacity', ship.toFixed(3));
     root.style.setProperty('--lamp-opacity', lamp.toFixed(3));
     root.style.setProperty('--halo-opacity', lamp.toFixed(3));
+    root.style.setProperty('--people-opacity', people.toFixed(3));
     root.style.setProperty('--birds-opacity', gulls.toFixed(3));
     return { beam: beam, ship: ship };
   }
@@ -270,8 +287,9 @@
 
     if (windowEl) {
       var ph = phaseFor(h);
+      var beach = (h >= 10 && h < 17) ? ', beach lively' : ((h >= 9.5 && h < 10) || (h >= 17 && h < 18.5) ? ', beach emptying' : ', beach empty');
       windowEl.setAttribute('aria-label',
-        'Lighthouse view at ' + formatClock(t) + ': ' + ph.label + '. ' + ph.desc);
+        'Lighthouse view at ' + formatClock(t) + ': ' + ph.label + '. ' + ph.desc + beach + '.');
     }
   }
 
@@ -335,10 +353,12 @@
     if (!seaSparklesEl || seaSparklesEl.childNodes.length > 0) return;
     var frag = document.createDocumentFragment();
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    for (var i = 0; i < 12; i++) {
+    for (var i = 0; i < 16; i++) {
       var sp = document.createElement('span');
       sp.className = 'spark';
-      sp.style.left = (8 + Math.random() * 84).toFixed(2) + '%';
+      // Bias half the sparkles to the emptier right side.
+      var x = i % 2 === 0 ? (48 + Math.random() * 44) : (8 + Math.random() * 84);
+      sp.style.left = x.toFixed(2) + '%';
       sp.style.top = (20 + Math.random() * 70).toFixed(2) + '%';
       if (!reduced) sp.style.animationDelay = (-Math.random() * 3.4).toFixed(2) + 's';
       frag.appendChild(sp);
